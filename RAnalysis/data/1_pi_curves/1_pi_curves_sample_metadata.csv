@@ -1,0 +1,9 @@
+Date,colony_id,Chamber.Channel,Position,Bin.ID,Run,Species,Temp.Cat,Chamber.Vol.L,Notes
+20220806,PA-1-PI,1,1,1,1,Porites astreoides,29,0.591,NA
+20220806,DL-2-PI,2,2,1,1,Diploria labyrinthiformis,29,0.578,NA
+20220806,MD-2-PI,3,3,1,1,Madracis decactis,29,0.606,NA
+20220806,MD-1-PI,4,4,1,1,Madracis decactis,29,0.605,NA
+20220806,BK-1-PI,5,5,1,1,Blank,29,0.61,NA
+20220806,MC-2-PI,6,6,1,1,Montastraea cavernosa,29,0.602,NA
+20220806,DL-1-PI,7,7,1,1,Diploria labyrinthiformis,29,0.596,NA
+20220806,MC-1-PI,8,8,1,1,Montastraea cavernosa,29,0.601,NA
