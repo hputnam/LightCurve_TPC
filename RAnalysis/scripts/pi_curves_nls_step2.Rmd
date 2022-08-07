@@ -125,11 +125,6 @@ augmented$ID <-augmented$colony_id
 Aug <- augmented %>% separate(ID, c("Sp", "Num", "Type"))
 
 #all colonies together
-Aug %>%
-  qplot(PAR, Pc, data = ., geom = 'point', colour = colony_id) +
-  geom_line(aes(y=.fitted, group_by(colony_id)))+
-  theme(legend.position="none")
-
 pdf("output/PI_Curve_Fit_Plots.pdf")
 PI.curves <- Aug %>%
 ggplot(aes(x=PAR, y=Pc, color=Sp))+
@@ -167,7 +162,7 @@ df <- df %>%
 pdf("output/PI_metrics_nls.pdf")
 PI.params <- df %>%
   ggplot(aes(x = species, y = value,fill=species)) +
-  geom_boxplot() +
+  geom_boxplot(alpha = 0.6) +
   scale_fill_manual(values=c("green", "black", "cyan", "orange"))+
   facet_wrap(~variable, scales = "free_y") +
   geom_jitter(width = 0.1)+
