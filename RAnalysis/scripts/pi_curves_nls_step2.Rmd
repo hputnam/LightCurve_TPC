@@ -58,6 +58,12 @@ Data <- read.csv(file = 'output/1_pi_curve_rates.csv')
 #specify data
 Data$PAR <- as.numeric(Data$Light_Value)
 Data$Pc <- as.numeric(Data$micromol.cm2.h)
+
+x <- Data %>% filter(Run==4)
+ x %>%
+ggplot(aes(x=PAR, y=Pc, color=Species))+
+  geom_point()
+
 ```
 
 

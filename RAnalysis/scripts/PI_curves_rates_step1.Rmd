@@ -102,7 +102,7 @@ df <- df %>%
                             labs(title = .y)))
 
 # Example of plots
-cowplot::plot_grid(df$data_plot[[1]], df$thin_data_plot[[1]], nrow = 2,
+cowplot::plot_grid(df$data_plot[[19]], df$thin_data_plot[[19]], nrow = 2,
                    labels = c("Example plot: all data", "Example plot: thinned data"))
 ```
 
@@ -143,8 +143,20 @@ plot_rankLcRg <- function(colony_id, interval_number) {
 ```
 
 #### The diagnostics for any regression can be plotted like this, specifying a colony_id and the number of the light curve interval:
-```
-plot_rankLcRg("ACR-225", 1)
+```{r}
+#THIS FUNCTION IS NOT WORKING BY COLONYID
+# pdf("output/Past-D1_test.pdf")
+# plot_rankLcRg("Past-D1", 1)
+# plot_rankLcRg("Past-D1", 2)
+# plot_rankLcRg("Past-D1", 3)
+# plot_rankLcRg("Past-D1", 4)
+# plot_rankLcRg("Past-D1", 5)
+# plot_rankLcRg("Past-D1", 6)
+# plot_rankLcRg("Past-D1", 7)
+# plot_rankLcRg("Past-D1", 8)
+# plot_rankLcRg("Past-D1", 9)
+# plot_rankLcRg("Past-D1", 10)
+# dev.off()
 ```
 
 ### Extract slope of best regression for each interval for each sample

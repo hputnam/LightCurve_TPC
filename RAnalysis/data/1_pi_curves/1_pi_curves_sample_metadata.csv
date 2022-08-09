@@ -23,3 +23,19 @@ Date,colony_id,Chamber.Channel,Position,Bin.ID,Run,Species,Temp.Cat,Chamber.Vol.
 20220808,Past-F1,6,6,1,3,Porites astreoides,29,0.588,NA
 20220808,Mcav-F1,7,7,1,3,Montastraea cavernosa,29,0.589,NA
 20220808,Mdec-E1,8,8,1,3,Madracis decactis,29,0.612,NA
+20220809,Dlab-B2,1,1,1,4,Diploria labyrinthiformis,40,0.59,Tissue sloughing and cloudy water by 40% light step
+20220809,BK-3,2,2,1,4,Blank,40,0.614,Tissue sloughing and cloudy water by 40% light step
+20220809,Past-B2,3,3,1,4,Porites astreoides,40,0.589,Tissue sloughing and cloudy water by 40% light step
+20220809,Mdec-A2,4,4,1,4,Madracis decactis,40,0.6,Tissue sloughing and cloudy water by 40% light step
+20220809,Mcav-A2,5,5,1,4,Montastraea cavernosa,40,0.589,Tissue sloughing and cloudy water by 40% light step
+20220809,Mcav-B2,6,6,1,4,Montastraea cavernosa,40,0.602,Tissue sloughing and cloudy water by 40% light step
+20220809,Past-A2,7,7,1,4,Porites astreoides,40,0.598,Tissue sloughing and cloudy water by 40% light step
+20220809,Dlab-A2,8,8,1,4,Diploria labyrinthiformis,40,0.6,Tissue sloughing and cloudy water by 40% light step
+20220809,Past-D2,1,1,1,5,Porites astreoides,40,0.582,Tissue sloughing and cloudy water by 40% light step
+20220809,Dlab-C2,2,2,1,5,Diploria labyrinthiformis,40,0.596,Tissue sloughing and cloudy water by 40% light step
+20220809,Dlab-E2,3,3,1,5,Diploria labyrinthiformis,40,0.592,Tissue sloughing and cloudy water by 40% light step
+20220809,Mcav-F2,4,4,1,5,Montastraea cavernosa,40,0.584,Tissue sloughing and cloudy water by 40% light step
+20220809,Mcav-C2,5,5,1,5,Montastraea cavernosa,40,0.606,Tissue sloughing and cloudy water by 40% light step
+20220809,Mdec-F2,6,6,1,5,Madracis decactis,40,0.6,Tissue sloughing and cloudy water by 40% light step
+20220809,Mdec-D2,7,7,1,5,Madracis decactis,40,0.602,Tissue sloughing and cloudy water by 40% light step
+20220809,Past-E2,8,8,1,5,Porites astreoides,40,0.584,Tissue sloughing and cloudy water by 40% light step
