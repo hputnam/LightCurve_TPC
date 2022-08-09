@@ -94,7 +94,7 @@ Using fixed initial values (keeping for reference):
 Using flexible initial values based on input data:  
 ```{r}
 nls_data <- Data %>% 
-   #filter(colony_id==c("ACR-140"))%>%
+   filter(PAR <550) %>%
    group_by(colony_id) %>%
    nest(-colony_id) %>%
    mutate(model1 = map(data, ~ 
@@ -113,7 +113,8 @@ nls_data <- Data %>%
 
 Plot curve over data points.  
 ```{r}
-augmented <- Data %>% 
+augmented <- Data %>%
+  filter(PAR <550) %>%
   nest(-colony_id) %>% 
   mutate(
     fit = map(data, ~ nls(Pc ~ (Am*((AQY*PAR)/(sqrt(Am^2 + (AQY*PAR)^2)))-Rd), data=., start=list(Am=1.7,  AQY=0.001, Rd=.4))),
@@ -130,10 +131,11 @@ PI.curves <- Aug %>%
 ggplot(aes(x=PAR, y=Pc, color=Sp))+
   geom_point() + 
   geom_line(aes(y=.fitted, x=PAR,group=colony_id))+
-  scale_color_manual(values=c("green", "black", "cyan", "orange"))+
+  scale_color_manual(values=c("green", "black", "cyan","orange"))+
   theme_classic()+
           labs(x = expression(paste('PAR (', mu, "mol photons m"^-2, 's'^-1,")")),
-               y = expression(paste('Oxygen flux (', mu, "mol cm"^-2, 'h'^-1,")")))
+               y = expression(paste('Oxygen flux (', mu, "mol cm"^-2, 'h'^-1,")")))+
+  theme(legend.position = c(0.8, 0.2))
 PI.curves
 dev.off()
 
@@ -158,15 +160,18 @@ df <- left_join(pars, md)
 df <- df %>%
   pivot_longer(cols=Am:Ik, names_to="variable")
 
-# Facet grid with common y-scale for each variable
+# Facet grid for each variable
 pdf("output/PI_metrics_nls.pdf")
 PI.params <- df %>%
   ggplot(aes(x = species, y = value,fill=species)) +
   geom_boxplot(alpha = 0.6) +
-  scale_fill_manual(values=c("green", "black", "cyan", "orange"))+
+  scale_fill_manual(values=c("green", "cyan", "black", "orange"))+
   facet_wrap(~variable, scales = "free_y") +
   geom_jitter(width = 0.1)+
-  theme_classic()
+  theme_classic()+
+  theme(legend.position="none")+
+  scale_x_discrete(labels=c("Diploria labyrinthiformis" = "Dlab", "Madracis decactis" = "Mdec",
+                              "Montastraea cavernosa" = "Mcav", "Porites astreoides" = "Past"))
 PI.params
 dev.off()
 
@@ -179,11 +184,11 @@ dev.off()
 #generate a combined figure of TPCs and estimate plots
 figure <- ggarrange(PI.curves , PI.params,
                     labels = c("A", "B"),
-                    ncol = 1, nrow = 2,
+                    ncol = 2, nrow = 1,
                     heights=c(1,0.5))
 figure
 
-ggsave("output/Curves.pdf", figure, dpi=300, w=6, h=8, units="in")
+ggsave("output/Curves.pdf", figure, dpi=300, w=7.5, h=4, units="in")
 
 ```
 

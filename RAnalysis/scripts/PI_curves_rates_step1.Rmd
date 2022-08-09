@@ -27,11 +27,6 @@ library(future)
 library(furrr)
 ```
 
-
-Need to find a way to load all data files, remove row with Channel = delta_t to get rid of artifact line, then convert time column back into hms???
-
-
-
 ## Import data
 ```{r}
 path.p <- "data/1_pi_curves/" #the location of all your respirometry files 
@@ -56,7 +51,7 @@ metadata <- full_join(sample.info, run.info) %>%
 
 # Select only certain columns
 metadata <- metadata %>%
-  select(Species, colony_id, Run, Chamber.Vol.L, Date, Start.time, Stop.time, Light_Value)
+  select(Species, colony_id, Run, Chamber.Vol.L, Date, Start.time, Stop.time, Light_Value, Light_Level)
 
 # Read in all data files 
 df <- tibble(file.name = file.names) %>%
@@ -177,9 +172,25 @@ blanks <- pr %>%
   group_by(Run, Light_Value) %>%
   summarise(micromol.s.blank = mean(micromol.s))
 
+blanks %>% ggplot(aes(x=as.numeric(Light_Value), y=micromol.s.blank))+
+  geom_point()
+
+str(summary(lm(blanks$micromol.s.blank~as.numeric(blanks$Light_Value))))
+anova(lm(blanks$micromol.s.blank~as.numeric(blanks$Light_Value)))
+
+xx <- blanks %>% 
+  group_by(Run) %>%
+  summarise(avgblank = mean(micromol.s.blank), sdblank  = sd(micromol.s.blank))
+
 # Join blank values with rest of data and subtract values from samples for same run and light value
-pr <- left_join(pr, blanks) %>%
-  mutate(micromol.s.adj = micromol.s - micromol.s.blank) %>%
+# pr <- left_join(pr, blanks) %>%
+#   mutate(micromol.s.adj = micromol.s - micromol.s.blank) %>%
+#   # After correcting for blank values, remove blanks from data
+#   filter(!grepl("BK", colony_id))
+
+
+pr <- pr %>%
+  mutate(micromol.s.adj = micromol.s - 0.0002297332) %>%
   # After correcting for blank values, remove blanks from data
   filter(!grepl("BK", colony_id))
 
