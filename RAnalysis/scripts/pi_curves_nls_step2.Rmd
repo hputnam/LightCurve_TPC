@@ -59,7 +59,8 @@ Data <- read.csv(file = 'output/1_pi_curve_rates.csv')
 Data$PAR <- as.numeric(Data$Light_Value)
 Data$Pc <- as.numeric(Data$micromol.cm2.h)
 
-x <- Data %>% filter(Run==4)
+x <- Data %>% filter(Run %in% c(10,11,12))
+
  x %>%
 ggplot(aes(x=PAR, y=Pc, color=Species))+
   geom_point()
@@ -99,6 +100,9 @@ Using fixed initial values (keeping for reference):
 
 Using flexible initial values based on input data:  
 ```{r}
+
+Data <- Data %>% filter(Run %in% c(10,11,12))
+
 nls_data <- Data %>% 
    filter(PAR <550) %>%
    group_by(colony_id) %>%

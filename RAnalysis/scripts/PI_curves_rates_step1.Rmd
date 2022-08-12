@@ -28,7 +28,7 @@ library(furrr)
 ```
 
 ## Import data
-```{r}
+```{r, warning = FALSE}
 path.p <- "data/1_pi_curves/" #the location of all your respirometry files 
 
 # List data files
@@ -78,7 +78,7 @@ df <- df %>%
 
 ## 'data' now contains the O2 data with the corresponding light level as another column
 ## Example of what 'data' for each sample looks like:
-# df$data[[1]]
+# df$data[[4]]
 ```
 
 ### Thin data
@@ -102,7 +102,7 @@ df <- df %>%
                             labs(title = .y)))
 
 # Example of plots
-cowplot::plot_grid(df$data_plot[[19]], df$thin_data_plot[[19]], nrow = 2,
+cowplot::plot_grid(df$data_plot[[4]], df$thin_data_plot[[4]], nrow = 2,
                    labels = c("Example plot: all data", "Example plot: thinned data"))
 ```
 
@@ -122,7 +122,7 @@ fit_reg <- function(df) {
 }
 
 # Setup for parallel processing
-future::plan(multiprocess)
+future::plan(multisession)
 
 # Map LoLinR function onto all intervals of each sample's thinned dataset
 df <- df %>%
@@ -184,7 +184,7 @@ blanks <- pr %>%
   group_by(Run, Light_Value) %>%
   summarise(micromol.s.blank = mean(micromol.s))
 
-blanks %>% ggplot(aes(x=as.numeric(Light_Value), y=micromol.s.blank))+
+blanks %>% ggplot(aes(x=as.numeric(Light_Value), y=micromol.s.blank,colour = as.factor(Run)))+
   geom_point()
 
 str(summary(lm(blanks$micromol.s.blank~as.numeric(blanks$Light_Value))))
@@ -223,7 +223,7 @@ pr <- pr %>%
 ```{r, fig.height=15, fig.width = 10}
 ggplot(pr, aes(x = as.numeric(Light_Value), y = micromol.cm2.h)) +
   geom_point(size = 3) +
-  facet_wrap(~colony_id, scale = "free_y", ncol = 3)
+  facet_wrap(~colony_id, ncol = 3)
 ```
 
 # Write to output file
