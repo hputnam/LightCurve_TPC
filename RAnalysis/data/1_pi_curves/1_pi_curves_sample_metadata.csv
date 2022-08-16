@@ -143,3 +143,27 @@ Date,colony_id,Chamber.Channel,Position,Bin.ID,Run,Species,Temp.Cat,Chamber.Vol.
 20220813,Past-B6,6,6,1,18,Porites astreoides,26,0.595,NA
 20220813,Dlab-D6,7,7,1,18,Diploria labyrinthiformis,26,0.595,NA
 20220813,Past-E6,8,8,1,18,Porites astreoides,26,0.606,NA
+20220815,Mdec-B7,1,1,1,19,Madracis decactis,36,0.597,NA
+20220815,Dlab-B7,2,2,1,19,Diploria labyrinthiformis,36,0.587,NA
+20220815,Past-D7,3,3,1,19,Porites astreoides,36,0.582,NA
+20220815,Mcav-D7,4,4,1,19,Montastraea cavernosa,36,0.588,NA
+20220815,Dlab-A7,5,5,1,19,Diploria labyrinthiformis,36,0.596,NA
+20220815,Mcav-F7,6,6,1,19,Montastraea cavernosa,36,0.59,NA
+20220815,Past-E7,7,7,1,19,Porites astreoides,36,0.594,NA
+20220815,Mdec-F7,8,8,1,19,Madracis decactis,36,0.605,NA
+20220815,Mdec-A7,1,1,1,20,Madracis decactis,36,0.596,NA
+20220815,Mcav-A7,2,2,1,20,Montastraea cavernosa,36,0.593,NA
+20220815,Dlab-E7,3,3,1,20,Diploria labyrinthiformis,36,0.59,NA
+20220815,Dlab-C7,4,4,1,20,Diploria labyrinthiformis,36,0.599,NA
+20220815,Mdec-D7,5,5,1,20,Madracis decactis,36,0.602,NA
+20220815,Past-A7,6,6,1,20,Porites astreoides,36,0.591,NA
+20220815,Mcav-C7,7,7,1,20,Montastraea cavernosa,36,0.592,NA
+20220815,Past-B7,8,8,1,20,Porites astreoides,36,0.587,NA
+20220815,Mdec-C7,1,1,1,21,Madracis decactis,36,0.595,NA
+20220815,Mdec-E7,2,2,1,21,Madracis decactis,36,0.599,NA
+20220815,Dlab-D7,3,3,1,21,Diploria labyrinthiformis,36,0.596,NA
+20220815,Mcav-B7,4,4,1,21,Montastraea cavernosa,36,0.601,NA
+20220815,Past-F7,5,5,1,21,Porites astreoides,36,0.596,NA
+20220815,Past-C7,6,6,1,21,Porites astreoides,36,0.597,NA
+20220815,BK-8,7,7,1,21,Blank,36,0.607,NA
+20220815,Dlab-F7,8,8,1,21,Diploria labyrinthiformis,36,0.588,NA

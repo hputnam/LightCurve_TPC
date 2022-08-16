@@ -71,7 +71,7 @@ df$id_group <- paste0(df$colony_id,"_", df$Temp.Cat)
 
 # Visualize data
 r_plot<-df %>%
-    ggplot(., aes(x = Temp.Cat, y = Ik.log10, colour=species)) +
+    ggplot(., aes(x = Temp.Cat, y = AQY.log10, colour=species)) +
     geom_point(aes(fill=species, group=species), pch = 21, size=2, alpha=0.5) + 
     xlab("Temperature") + 
     #scale_fill_manual(name="Treatment", values=c("#3450A3","#E9A33D"))+
@@ -90,7 +90,7 @@ ggsave("output/Pmax_Scatter_withOutliers.pdf", r_plot, dpi=300, w=8, h=8, units=
 View and remove outliers.   
 ```{r, warning=FALSE, message=FALSE}
 #identify outliers by Temperature and Treatment groups
-outlier.plot <- ggbetweenstats(df,group, Ik.log10, outlier.tagging = TRUE)
+outlier.plot <- ggbetweenstats(df,group, AQY.log10, outlier.tagging = TRUE)
 ggsave("output/Pmax_outliersbygroup.pdf", outlier.plot, dpi=300, w=16, h=8, units="in")
 
 # #set quantile values
@@ -99,9 +99,9 @@ ggsave("output/Pmax_outliersbygroup.pdf", outlier.plot, dpi=300, w=16, h=8, unit
 # # calculate quantile values by Temperature and Treatment groups
 # Quants <- df %>%
 #   group_by(species, Temp.Cat) %>%
-#   summarize(quant25 = quantile(Ik.log10, probs = q[1]),
-#             quant75 = quantile(Ik.log10, probs = q[2]),
-#             IQRbyGroup=IQR(Ik.log10))
+#   summarize(quant25 = quantile(AQY.log10, probs = q[1]),
+#             quant75 = quantile(AQY.log10, probs = q[2]),
+#             IQRbyGroup=IQR(AQY.log10))
 # 
 # # add a group name by pasting Temperature and Treatment
 # Quants$group <-paste0(Quants$species,"_", Quants$Temp.Cat)
@@ -115,13 +115,13 @@ ggsave("output/Pmax_outliersbygroup.pdf", outlier.plot, dpi=300, w=16, h=8, unit
 # 
 # #remove outliers from rates
 # x <- df %>%
-#   filter(Ik.log10 < upper) %>%
-#   filter(Ik.log10 > lower) #%>%
+#   filter(AQY.log10 < upper) %>%
+#   filter(AQY.log10 > lower) #%>%
 #   #filter(rate < 0.125)
 # 
 # # Visualize data following outlier removal
 # r_plot<-df %>%
-#     ggplot(., aes(x = Temp.Cat, y = Ik.log10, colour=species)) +
+#     ggplot(., aes(x = Temp.Cat, y = AQY.log10, colour=species)) +
 #     geom_point(aes(fill=species, group=species), pch = 21, size=2, alpha=0.5) + 
 #     xlab("Temperature") + 
 #     #scale_fill_manual(name="Treatment", values=c("#3450A3","#E9A33D"))+
@@ -154,11 +154,11 @@ get_model_names()
 #sharpeschoolhigh_1981
 
 # get start vals
-start_vals <- get_start_vals(df$Temp.Cat,df$Ik.log10, model_name = 'sharpeschoolhigh_1981')
+start_vals <- get_start_vals(df$Temp.Cat,df$AQY.log10, model_name = 'sharpeschoolhigh_1981')
 
 # get limits
-low_lims <- get_lower_lims(df$Temp.Cat,df$Ik.log10, model_name = 'sharpeschoolhigh_1981')
-upper_lims <- get_upper_lims(df$Temp.Cat,df$Ik.log10, model_name = 'sharpeschoolhigh_1981')
+low_lims <- get_lower_lims(df$Temp.Cat,df$AQY.log10, model_name = 'sharpeschoolhigh_1981')
+upper_lims <- get_upper_lims(df$Temp.Cat,df$AQY.log10, model_name = 'sharpeschoolhigh_1981')
 
 #view values
 start_vals
@@ -174,7 +174,7 @@ Dlab.df <- df %>%
   filter(!id_group=="Dlab-F6_26")
 
 #fit 
-Dlab.fit <- nls_multstart(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Dlab.fit <- nls_multstart(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                                                      data = Dlab.df,
                                                      iter = 500,
                                                      start_lower = start_vals - 1,
@@ -186,7 +186,7 @@ Dlab.fit <- nls_multstart(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref
 Dlab.fit
 
 #generate the predicted data
-Dlab_new_data <- data.frame(temp = seq(min(Dlab.df$Temp.Cat), max(Dlab.df$Temp.Cat), 0.7))
+Dlab_new_data <- data.frame(temp = seq(min(Dlab.df$Temp.Cat), max(Dlab.df$Temp.Cat), 0.61))
 Dlab.preds <- augment(Dlab.fit, newdata = Dlab_new_data)
 
 #calculate TPC parameters
@@ -200,7 +200,7 @@ Dlab.TCP.res
 #Resampling the original data with replacement
 
 # refit model using nlsLM
-Dlab.fit_nlsLM <- minpack.lm::nlsLM(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Dlab.fit_nlsLM <- minpack.lm::nlsLM(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                         data = Dlab.df,
                         start = coef(Dlab.fit),
                         lower = low_lims,
@@ -234,7 +234,7 @@ Dlab.boot1_conf_preds <- group_by(Dlab.boot1_preds, temp) %>%
 Dlab.CI.plot <- ggplot() +
   #geom_line(aes(temp, .fitted), Dlab.preds, col = '#3450A3') +
   geom_ribbon(aes(temp, ymin = conf_lower, ymax = conf_upper), Dlab.boot1_conf_preds, fill = 'green', alpha = 0.3) +
-  geom_point(aes(Temp.Cat, Ik.log10), Dlab.df, size = 2, alpha = 0.5,col = 'green') +
+  geom_point(aes(Temp.Cat, AQY.log10), Dlab.df, size = 2, alpha = 0.5,col = 'green') +
   theme_bw(base_size = 12) +
   labs(x = 'Temperature (ºC)',
        y = 'Log 10 Pmax (µmol O2/cm2/hr)')
@@ -245,11 +245,11 @@ Dlab.CI.plot
 Mdec CURVE FIT
 ```{r}
 Mdec.df <- df %>% 
-  filter(species=="Madracis decactis") #%>%
-  #filter(!id_group=="Mdec-B6_26")
+  filter(species=="Madracis decactis") %>%
+  filter(!id_group=="Mdec-B6_26") %>% filter(!id_group=="Mdec-D7_36")
 
 #fit 
-Mdec.fit <- nls_multstart(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Mdec.fit <- nls_multstart(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                                                      data = Mdec.df,
                                                      iter = 500,
                                                      start_lower = start_vals - 1,
@@ -261,7 +261,7 @@ Mdec.fit <- nls_multstart(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref
 Mdec.fit
 
 #generate the predicted data
-Mdec_new_data <- data.frame(temp = seq(min(Mdec.df$Temp.Cat), max(Mdec.df$Temp.Cat), 0.7))
+Mdec_new_data <- data.frame(temp = seq(min(Mdec.df$Temp.Cat), max(Mdec.df$Temp.Cat), 0.6))
 Mdec.preds <- augment(Mdec.fit, newdata = Mdec_new_data)
 
 #calculate TPC parameters
@@ -275,7 +275,7 @@ Mdec.TCP.res
 #Resampling the original data with replacement
 
 # refit model using nlsLM
-Mdec.fit_nlsLM <- minpack.lm::nlsLM(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Mdec.fit_nlsLM <- minpack.lm::nlsLM(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                         data = Mdec.df,
                         start = coef(Mdec.fit),
                         lower = low_lims,
@@ -309,7 +309,7 @@ Mdec.boot1_conf_preds <- group_by(Mdec.boot1_preds, temp) %>%
 Mdec.CI.plot <- ggplot() +
   #geom_line(aes(temp, .fitted), Mdec.preds, col = '#3450A3') +
   geom_ribbon(aes(temp, ymin = conf_lower, ymax = conf_upper), Mdec.boot1_conf_preds, fill = 'cyan', alpha = 0.3) +
-  geom_point(aes(Temp.Cat, Ik.log10), Mdec.df, size = 2, alpha = 0.5,col = 'cyan') +
+  geom_point(aes(Temp.Cat, AQY.log10), Mdec.df, size = 2, alpha = 0.5,col = 'cyan') +
   theme_bw(base_size = 12) +
   labs(x = 'Temperature (ºC)',
        y = 'Log 10 Pmax (µmol O2/cm2/hr)')
@@ -320,10 +320,11 @@ Mdec.CI.plot
 Mcav CURVE FIT
 ```{r}
 Mcav.df <- df %>% 
-  filter(species=="Montastraea cavernosa")
+  filter(species=="Montastraea cavernosa")%>%
+  filter(!id_group=="Mcav-D7_36")
 
 #fit 
-Mcav.fit <- nls_multstart(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Mcav.fit <- nls_multstart(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                                                      data = Mcav.df,
                                                      iter = 500,
                                                      start_lower = start_vals - 1,
@@ -335,7 +336,7 @@ Mcav.fit <- nls_multstart(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref
 Mcav.fit
 
 #generate the predicted data
-Mcav_new_data <- data.frame(temp = seq(min(Mcav.df$Temp.Cat), max(Mcav.df$Temp.Cat), 0.7))
+Mcav_new_data <- data.frame(temp = seq(min(Mcav.df$Temp.Cat), max(Mcav.df$Temp.Cat), 0.6))
 Mcav.preds <- augment(Mcav.fit, newdata = Mcav_new_data)
 
 #calculate TPC parameters
@@ -349,7 +350,7 @@ Mcav.TCP.res
 #Resampling the original data with replacement
 
 # refit model using nlsLM
-Mcav.fit_nlsLM <- minpack.lm::nlsLM(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Mcav.fit_nlsLM <- minpack.lm::nlsLM(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                         data = Mcav.df,
                         start = coef(Mcav.fit),
                         lower = low_lims,
@@ -383,7 +384,7 @@ Mcav.boot1_conf_preds <- group_by(Mcav.boot1_preds, temp) %>%
 Mcav.CI.plot <- ggplot() +
   #geom_line(aes(temp, .fitted), Mcav.preds, col = '#3450A3') +
   geom_ribbon(aes(temp, ymin = conf_lower, ymax = conf_upper), Mcav.boot1_conf_preds, fill = 'black', alpha = 0.3) +
-  geom_point(aes(Temp.Cat, Ik.log10), Mcav.df, size = 2, alpha = 0.5,col = 'black') +
+  geom_point(aes(Temp.Cat, AQY.log10), Mcav.df, size = 2, alpha = 0.5,col = 'black') +
   theme_bw(base_size = 12) +
   labs(x = 'Temperature (ºC)',
        y = 'Log 10 Pmax (µmol O2/cm2/hr)')
@@ -396,10 +397,11 @@ Past CURVE FIT
 ```{r}
 Past.df <- df %>% 
   filter(species=="Porites astreoides") %>%
-  filter(!id_group=="Past-C6_26")
+  filter(!id_group=="Past-C6_26") %>%
+  filter(!id_group=="Past-E7_36")
 
 #fit 
-Past.fit <- nls_multstart(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Past.fit <- nls_multstart(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                                                      data = Past.df,
                                                      iter = 500,
                                                      start_lower = start_vals - 1,
@@ -425,7 +427,7 @@ Past.TCP.res
 #Resampling the original data with replacement
 
 # refit model using nlsLM
-Past.fit_nlsLM <- minpack.lm::nlsLM(Ik.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
+Past.fit_nlsLM <- minpack.lm::nlsLM(AQY.log10~sharpeschoolhigh_1981(temp = Temp.Cat, r_tref,e,eh,th, tref = 28),
                         data = Past.df,
                         start = coef(Past.fit),
                         lower = low_lims,
@@ -459,7 +461,7 @@ Past.boot1_conf_preds <- group_by(Past.boot1_preds, temp) %>%
 Past.CI.plot <- ggplot() +
   #geom_line(aes(temp, .fitted), Past.preds, col = '#3450A3') +
   geom_ribbon(aes(temp, ymin = conf_lower, ymax = conf_upper), Past.boot1_conf_preds, fill = 'orange', alpha = 0.3) +
-  geom_point(aes(Temp.Cat, Ik.log10), Past.df, size = 2, alpha = 0.5,col = 'orange') +
+  geom_point(aes(Temp.Cat, AQY.log10), Past.df, size = 2, alpha = 0.5,col = 'orange') +
   theme_bw(base_size = 12) +
   labs(x = 'Temperature (ºC)',
        y = 'Log 10 Pmax (µmol O2/cm2/hr)')
@@ -476,10 +478,10 @@ cols <- c("Dlab"="green",
   
 # plot data and model fit
 TPC.plot <- ggplot(data=df, aes()) +
-   geom_point(aes(Temp.Cat, Ik.log10), color="green", Dlab.df, size = 2, alpha = 0.5) +
-   geom_point(aes(Temp.Cat, Ik.log10), color="cyan", Mdec.df, size = 2, alpha = 0.5) +
-   geom_point(aes(Temp.Cat, Ik.log10), color="black", Mcav.df, size = 2, alpha = 0.5) +
-   geom_point(aes(Temp.Cat, Ik.log10), color="orange", Past.df, size = 2, alpha = 0.5) +
+   geom_point(aes(Temp.Cat, AQY.log10), color="green", Dlab.df, size = 2, alpha = 0.5) +
+   geom_point(aes(Temp.Cat, AQY.log10), color="cyan", Mdec.df, size = 2, alpha = 0.5) +
+   geom_point(aes(Temp.Cat, AQY.log10), color="black", Mcav.df, size = 2, alpha = 0.5) +
+   geom_point(aes(Temp.Cat, AQY.log10), color="orange", Past.df, size = 2, alpha = 0.5) +
    geom_ribbon(aes(temp, ymin = conf_lower, ymax = conf_upper), Dlab.boot1_conf_preds, fill = "green", alpha = 0.3) +
    geom_ribbon(aes(temp, ymin = conf_lower, ymax = conf_upper), Mdec.boot1_conf_preds, fill = 'cyan', alpha = 0.3) +
   geom_ribbon(aes(temp, ymin = conf_lower, ymax = conf_upper), Mcav.boot1_conf_preds, fill = 'black', alpha = 0.3) +
@@ -492,7 +494,7 @@ TPC.plot <- ggplot(data=df, aes()) +
          panel.border = element_blank(), panel.grid.major = element_blank(),
          panel.grid.minor = element_blank(), axis.line = element_line(colour = "black"))+
    labs(x = 'Temperature (ºC)',
-        y = expression("Log 10 Ik µmol photons "~m^{-2}~s^{-1}))
+        y = expression("Log 10 Rdark µmol Oxygen"~cm^{-2}~h^{-1}))
 
 TPC.plot 
 
