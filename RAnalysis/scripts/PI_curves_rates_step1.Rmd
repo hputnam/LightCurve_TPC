@@ -76,7 +76,7 @@ df <- df %>%
                       labels = as.character(.y$Light_Value)))})) %>%
   mutate(data = map(intervals, ~ unnest(tibble(.), .id = "Light_Value")))
 
-## 'data' now contains the O2 data with the corresponding light level as another column
+## 'data' now contains the O2 data with the corresponding light value as another column
 ## Example of what 'data' for each sample looks like:
 # df$data[[4]]
 ```
@@ -171,8 +171,10 @@ df.out <- df %>%
 ### Merge rates with sample info
 pr <- left_join(
   select(df.out,colony_id, Light_Value, micromol.L.s),
-  distinct(metadata, Species,colony_id, Run, Chamber.Vol.L)
-)
+  distinct(metadata, Species,colony_id, Run, Chamber.Vol.L))
+
+###Remove extra step from Run 1
+pr <-pr %>% filter(!Light_Value>550)
 
 ### Correct for chamber volume and blanks
 pr <- pr %>%
@@ -181,24 +183,19 @@ pr <- pr %>%
 # Get blank values -- average for each run and light value in case multiple blanks
 blanks <- pr %>%
   filter(grepl("BK", colony_id)) %>%
-  group_by(Run, Light_Value) %>%
-  summarise(micromol.s.blank = mean(micromol.s))
+  group_by(Run, Light_Value) 
 
-blanks %>% ggplot(aes(x=as.numeric(Light_Value), y=micromol.s.blank,colour = as.factor(Run)))+
+blanks %>% ggplot(aes(x=as.numeric(Light_Value), y=micromol.s,colour = as.factor(Run)))+
   geom_point()
 
-str(summary(lm(blanks$micromol.s.blank~as.numeric(blanks$Light_Value))))
-anova(lm(blanks$micromol.s.blank~as.numeric(blanks$Light_Value)))
+str(summary(lm(xx$micromol.s.blank~as.numeric(xx$Light_Value))))
+anova(lm(xx$micromol.s.blank~as.numeric(xx$Light_Value)))
 
-xx <- blanks %>% 
-  group_by(Run) %>%
-  summarise(avgblank = mean(micromol.s.blank), sdblank  = sd(micromol.s.blank))
-
-# Join blank values with rest of data and subtract values from samples for same run and light value
-# pr <- left_join(pr, blanks) %>%
-#   mutate(micromol.s.adj = micromol.s - micromol.s.blank) %>%
-#   # After correcting for blank values, remove blanks from data
-#   filter(!grepl("BK", colony_id))
+#Join blank values with rest of data and subtract values from samples for same run and light value
+pr <- left_join(pr, blanks) %>%
+  mutate(micromol.s.adj = micromol.s - micromol.s.blank) %>%
+  # After correcting for blank values, remove blanks from data
+  filter(!grepl("BK", colony_id))
 
 
 pr <- pr %>%
