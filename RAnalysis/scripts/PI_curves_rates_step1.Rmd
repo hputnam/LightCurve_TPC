@@ -27,7 +27,7 @@ library(future)
 library(furrr)
 ```
 
-## Import data
+## Import metadata
 ```{r, warning = FALSE}
 path.p <- "data/1_pi_curves/" #the location of all your respirometry files 
 
@@ -41,10 +41,6 @@ sample.info <- read_csv(file = "data/1_pi_curves/1_pi_curves_sample_metadata.csv
 # Load PI curve run metadata (i.e., light levels and interval times for each run)
 run.info <- read_csv(file = "data/1_pi_curves/1_pi_curves_run_metadata.csv")
 
-
-#test.file<-read_csv(file="data/1_pi_curves/POC-391_20200107.csv", skip=1, col_types = cols(.default = "d", Time = "t")) #do this to correct time format issue
-
-
 # Join all coral and run metadata
 metadata <- full_join(sample.info, run.info) %>%
   mutate(Date = as_date(as.character(Date), format = "%Y%m%d", tz = "Atlantic"))
@@ -52,8 +48,11 @@ metadata <- full_join(sample.info, run.info) %>%
 # Select only certain columns
 metadata <- metadata %>%
   select(Species, colony_id, Run, Chamber.Vol.L, Date, Start.time, Stop.time, Light_Value, Light_Level)
+```
 
-# Read in all data files 
+
+# Read in all data files
+```{r, results="hide", message=FALSE}
 df <- tibble(file.name = file.names) %>%
   mutate(colony_id = gsub("_.*", "", file.name),                              # Get colony_id from filename
           info = map(colony_id, ~filter(metadata, colony_id == .)),           # Get associated sample info
@@ -67,8 +66,6 @@ df <- df %>%
 ```
 
 ## Use the time breaks in the sample info to link O2 data with light levels
-
-
 ```{r, warning = FALSE}
 df <- df %>%
   mutate(intervals = map2(data0, info, function(.x, .y) {
@@ -144,6 +141,13 @@ plot_rankLcRg <- function(colony_id, interval_number) {
 
 #### The diagnostics for any regression can be plotted like this, specifying a colony_id and the number of the light curve interval:
 ```{r}
+# Define function to pull out and plot regression diagnostics
+# plot_rankLcRg <- function(colony_id, interval_number) {
+#   df %>%
+#     filter(colony_id == colony_id) %>%
+#     pluck("regs", 1, "rankLcRg", interval_number) %>%
+#     plot()
+# }
 #THIS FUNCTION IS NOT WORKING BY COLONYID
 # pdf("output/Past-D1_test.pdf")
 # plot_rankLcRg("Past-D1", 1)
@@ -173,35 +177,55 @@ pr <- left_join(
   select(df.out,colony_id, Light_Value, micromol.L.s),
   distinct(metadata, Species,colony_id, Run, Chamber.Vol.L))
 
-###Remove extra step from Run 1
+###Remove extra light step from Run 1
 pr <-pr %>% filter(!Light_Value>550)
+```
 
-### Correct for chamber volume and blanks
+# Correct for chamber volume and blanks
+```{r}
+### generate a key for the blank id
 pr <- pr %>%
-  mutate(micromol.s = micromol.L.s * Chamber.Vol.L)
+  mutate(Run_blank_light=paste0(Run,"_","blank","_",Light_Value))%>%
+  mutate(blank_id=paste0(Run,"_","blank"))
 
 # Get blank values -- average for each run and light value in case multiple blanks
 blanks <- pr %>%
   filter(grepl("BK", colony_id)) %>%
-  group_by(Run, Light_Value) 
+  mutate(micromol.s.blank = micromol.L.s * Chamber.Vol.L)%>%
+  group_by(Run, Light_Value) %>%
+  mutate(blank_id=paste0(Run,"_","blank"))%>%
+  mutate(Run_blank_light=paste0(Run,"_","blank","_",Light_Value))
 
-blanks %>% ggplot(aes(x=as.numeric(Light_Value), y=micromol.s,colour = as.factor(Run)))+
+blanks %>% ggplot(aes(x=as.numeric(Light_Value), y=micromol.s.blank,colour = as.factor(Run)))+
   geom_point()
 
-str(summary(lm(xx$micromol.s.blank~as.numeric(xx$Light_Value))))
-anova(lm(xx$micromol.s.blank~as.numeric(xx$Light_Value)))
+mean.blank <- blanks %>%
+ ungroup(Run, Light_Value) %>%
+  summarise(mean = mean(micromol.s.blank))
+
+str(summary(lm(blanks$micromol.s.blank~as.numeric(blanks$Light_Value))))
+anova(lm(blanks$micromol.s.blank~as.numeric(blanks$Light_Value)))
+
+# specific.blanks <- read_csv(file = "data/1_pi_curves/blank_groups.csv")
+# blanks <-  left_join(blanks,specific.blanks, keep=F)
+
+pr <- pr %>% mutate(micromol.s = micromol.L.s * Chamber.Vol.L)
+
+#pr <-  left_join(pr, blanks, by="blank_id", keep=F)
 
 #Join blank values with rest of data and subtract values from samples for same run and light value
-pr <- left_join(pr, blanks) %>%
-  mutate(micromol.s.adj = micromol.s - micromol.s.blank) %>%
-  # After correcting for blank values, remove blanks from data
-  filter(!grepl("BK", colony_id))
-
-
 pr <- pr %>%
-  mutate(micromol.s.adj = micromol.s - 0.0002297332) %>%
+  mutate(micromol.s.adj = micromol.s - -0.0003515243) %>%
+  #mutate(micromol.s.adj = micromol.s - micromol.s.blank) %>%
   # After correcting for blank values, remove blanks from data
   filter(!grepl("BK", colony_id))
+
+# pr  <- pr  %>%
+#   rename(colony_id = colony_id.x)
+# 
+# pr  <- pr  %>%
+#   rename(Light_Value = Light_Value.x)
+
 
 
 # Import surface area data
