@@ -1,6 +1,6 @@
-### Bayesian  model showing the relationship between SGD and PR by species interactions for Jamie Kerlin
-### Created on 7/27/2022
-### Created by Nyssa Silbiger
+### Bayesian  model for PI curve fitting
+### Created on 9/7/2023
+### Created by Nyssa Silbiger and Hollie Putnam
 ### https://github.com/stan-dev/rstan/wiki/Installing-RStan-from-Source
 
 ### Load Libraries ##########
@@ -116,14 +116,14 @@ names
 fits <- setNames(vector("list", length(names)), names)
 
 for (i in names) {
+  data_model<-Data_sub_Dlab%>%filter(colony_id==i)
   fits[[i]] <- fixef(brm(bf(Pc ~ (Am*((AQY*PAR)/(sqrt(Am^2 + (AQY*PAR)^2)))-Rd), Am ~ 1, AQY ~ 1, Rd ~ 1, nl = TRUE), 
-                   data = Data_sub_Dlab, family = gaussian(),
+                   data = data_model, family = gaussian(),
                    prior = prior1,
                    chains = 4, iter = 2000, seed = 333))
 }
 fits
 
-#why does it run with the data of all samples and not specific colonies, but put the output in the correct location?
 
 
 
