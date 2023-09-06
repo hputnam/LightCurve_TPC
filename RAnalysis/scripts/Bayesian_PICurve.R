@@ -25,7 +25,7 @@ Data_sub <- Data %>%
 
 Data_sub_Dlab <- Data_sub %>% filter(Species %in% "Diploria labyrinthiformis")
 
-Data_sub_Dlab_A3 <- Data_sub %>% filter(colony_id == "Mdec-D4")
+Data_sub_Dlab_A1 <- Data_sub %>% filter(colony_id == "Dlab-A1")
 #Data_sub_Past <- Data_sub %>% filter(Species == "Porites astreoides")
 
 ggplot(Data_sub, aes(x = PAR, y=Pc))+
@@ -34,7 +34,7 @@ ggplot(Data_sub, aes(x = PAR, y=Pc))+
 ggplot(Data_sub_Dlab, aes(x = PAR, y=Pc))+
   geom_point()
 
-ggplot(Data_sub_Dlab_A3, aes(PAR, y=Pc))+
+ggplot(Data_sub_Dlab_A1, aes(PAR, y=Pc))+
   geom_point()
 
 #set priors
@@ -46,7 +46,7 @@ prior1 <- c(set_prior("normal(0, 5)", nlpar = "Am", lb = 0),
 #Pc ~ (Am*((AQY*PAR)/(sqrt(Am^2 + (AQY*PAR)^2)))-Rd)
 
 fit <- brm(bf(Pc ~ (Am*((AQY*PAR)/(sqrt(Am^2 + (AQY*PAR)^2)))-Rd), Am ~ 1, AQY ~ 1, Rd ~ 1, nl = TRUE), 
-              data = Data_sub_Dlab, family = gaussian(),
+              data = Data_sub_Dlab_A1, family = gaussian(),
               prior = prior1,
               chains = 4, iter = 2000, seed = 333)
 
@@ -110,15 +110,25 @@ ggplot(pred_draws,
   theme(legend.position = "bottom")
 
 #fit many models with a for loop
-sample.list <- list(unique(Data_sub_Dlab$colony_id))
-for (i in 1:length(sample.list)) {
-  samples[[i]] <- fixef(brm(bf(Pc ~ (Am*((AQY*PAR)/(sqrt(Am^2 + (AQY*PAR)^2)))-Rd), Am ~ 1, AQY ~ 1, Rd ~ 1, nl = TRUE), 
+
+names <- unique(Data_sub_Dlab$colony_id)
+names 
+fits <- setNames(vector("list", length(names)), names)
+
+for (i in names) {
+  fits[[i]] <- fixef(brm(bf(Pc ~ (Am*((AQY*PAR)/(sqrt(Am^2 + (AQY*PAR)^2)))-Rd), Am ~ 1, AQY ~ 1, Rd ~ 1, nl = TRUE), 
                    data = Data_sub_Dlab, family = gaussian(),
                    prior = prior1,
                    chains = 4, iter = 2000, seed = 333))
 }
-samples
+fits
 
-# Error in `[[<-`(`*tmp*`, i, value = fixef(brm(bf(Pc ~ (Am * ((AQY * PAR)/(sqrt(Am^2 +  : 
-#recursive indexing failed at level 2
+#why does it run with the data of all samples and not specific colonies, but put the output in the correct location?
 
+
+
+#outputs
+#https://stackoverflow.com/questions/74262090/storing-model-estimates-after-running-several-models-in-a-for-loop-in-r
+
+#samples %>%
+#  spread_draws()
