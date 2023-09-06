@@ -111,12 +111,12 @@ ggplot(pred_draws,
 
 #fit many models with a for loop
 
-names <- unique(Data_sub_Dlab$colony_id)
+names <- unique(Data_sub$colony_id)
 names 
 fits <- setNames(vector("list", length(names)), names)
 
 for (i in names) {
-  data_model<-Data_sub_Dlab%>%filter(colony_id==i)
+  data_model<-Data_sub %>% filter(colony_id==i)
   fits[[i]] <- fixef(brm(bf(Pc ~ (Am*((AQY*PAR)/(sqrt(Am^2 + (AQY*PAR)^2)))-Rd), Am ~ 1, AQY ~ 1, Rd ~ 1, nl = TRUE), 
                    data = data_model, family = gaussian(),
                    prior = prior1,
@@ -124,8 +124,23 @@ for (i in names) {
 }
 fits
 
+Estimates <- as.data.frame(fits)
 
-
+# Estimates <- pivot_longer(Estimates, cols=1:ncol(Estimates))
+# 
+# Estimates <- separate(Estimates, name, into = c('colony_id', 'metric'), sep=7)
+# Estimates <- separate(Estimates, colony_id, into = c('species', 'colony_id'), sep=4, remove = FALSE)
+# Estimates$colony_id <- paste0(Estimates$species, Estimates$colony_id)
+# 
+# #Plot all of the estimates
+# estimate.plots <- ggplot(Estimates, aes(colony_id, value, color=colony_id)) +
+#   geom_point(size = 2) +
+#   #geom_linerange(aes(ymin = conf_lower, ymax = conf_upper)) +
+#   theme_bw() +
+#   facet_wrap(~metric*species, scales = 'free_y') +
+#   scale_x_discrete('')
+# 
+# estimate.plots
 
 #outputs
 #https://stackoverflow.com/questions/74262090/storing-model-estimates-after-running-several-models-in-a-for-loop-in-r
