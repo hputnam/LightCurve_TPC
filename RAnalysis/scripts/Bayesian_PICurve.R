@@ -117,7 +117,7 @@ prior1 <- c(set_prior("normal(0, 5)", nlpar = "Am", lb = 0),
 
 #fit many models with a for loop
 
-names <- unique(md$colony_id)
+names <- unique(Data_sub$colony_id)
 names 
 fits <- setNames(vector("list", length(names)), names)
 
@@ -137,9 +137,6 @@ param.estimates <- param.estimates %>% separate(variable,  into=c("colony_id", "
 param.estimates <- param.estimates %>% separate(colony_id, into = c('species', 'colony_id'), sep=4, remove = FALSE)
 param.estimates$colony_id <- paste0(param.estimates$species, param.estimates$colony_id)
 param.estimates$colony_id <- gsub("\\.","-", param.estimates$colony_id)
-
-#load metadata
-md <- read_csv("data/1_pi_curves/coral_metadata.csv")
 
 #join parameters and metadata
 Data.out <- left_join(param.estimates, md, by="colony_id")
