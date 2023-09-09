@@ -16,6 +16,8 @@ library(reshape2)
 
 ##### Load data ###########
 Data<-read_csv(here("output","pi_curve_extracted_rates.csv"))
+length(unique(Data$colony_id))
+
 #load metadata
 md <- read_csv("data/1_pi_curves/coral_metadata.csv")
 md <- md  %>%filter(species!="Blank")
@@ -25,23 +27,11 @@ All <- left_join(Data, md, by="colony_id")
 #identify light and oxygen flux rates
 Data$PAR <- as.numeric(Data$Light_Value.x)
 Data$Pc <- as.numeric(Data$micromol.cm2.h)
-Data_sub <- Data #%>% 
- # filter(!Run %in% c(4,5,6)) #%>% 
-  #filter(!colony_id %in% c("Mdec-D3", "Mcav-B2", "Dlab-B7", "Dlab-D4", "Dlab-F6", "Dlab-A6", "Past-A1", "Past-A3", "Past-A6"))
-
-#Data_sub_Dlab <- Data_sub %>% filter(Species %in% "Diploria labyrinthiformis")
-
-#Data_sub_Dlab_A1 <- Data_sub %>% filter(colony_id == "Dlab-A1")
-#Data_sub_Past <- Data_sub %>% filter(Species == "Porites astreoides")
+Data_sub <- Data 
+length(unique(Data$colony_id))
 
 ggplot(Data_sub, aes(x = PAR, y=Pc))+
   geom_point()
-
-#ggplot(Data_sub_Dlab, aes(x = PAR, y=Pc))+
-#  geom_point()
-
-#ggplot(Data_sub_Dlab_A1, aes(PAR, y=Pc))+
-#  geom_point()
 
 #set priors
 prior1 <- c(set_prior("normal(0, 5)", nlpar = "Am", lb = 0),
@@ -147,7 +137,7 @@ estimate.plots <-Data.out %>% filter(metric==".Estimate") %>%
   geom_point(size = 2) +
   #geom_linerange(aes(ymin = conf_lower, ymax = conf_upper)) +
   theme_bw() +
-  facet_wrap(~parameter*species.x, scales = 'free')
+  facet_wrap(~parameter*species.x)
 
 estimate.plots
 
